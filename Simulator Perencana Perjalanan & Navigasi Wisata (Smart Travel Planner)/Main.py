@@ -88,11 +88,35 @@ def main():
             elif pilih_kat == "2":
                 kat = "Budaya"
             else:
-                kat = "hiburan"
+                kat = "Kuliner"
 
             # 6. Input Koordinat (PASTIKAN DI SINI, DI LUAR LOOP BIAYA)
-            lat = input("Latitude: ")
-            lon = input("Longitude: ")
+            while True:
+                try:
+                    lat = input("Latitude (-90 s/d 90): ")
+                    lat = float(lat)
+                    if lat < -90 or lat > 90:
+                        print("Latitude harus antara -90 sampai 90!")
+                        continue
+                    break
+
+                except ValueError:
+                    print("Latitude harus berupa angka!")
+
+            while True:
+                try:
+
+                    lon = input("Longitude (-180 s/d 180): ")
+                    lon = float(lon)
+
+                    if lon < -180 or lon > 180:
+                        print("Longitude harus antara -180 sampai 180!")
+                        continue
+
+                    break
+
+                except ValueError:
+                    print("Longitude harus berupa angka!")
 
             # 7. Memasukkan data ke Objek Destinasi dan Struktur Data
             d = Destinasi(
@@ -218,3 +242,179 @@ def main():
                 print("Undo berhasil!")
             else:
                 print("Tidak ada data.")
+
+                # =====================================================
+        # QUEUE
+        # =====================================================
+        elif pilih == "8":
+
+            print("\n=== ANTREAN TIKET ===")
+            print("1. Tambah Antrean")
+            print("2. Proses Antrean")
+            print("3. Lihat Antrean")
+
+            q = input("Pilih: ")
+
+            # Tambah antrean
+            if q == "1":
+
+                nama = input("Nama Turis: ")
+
+                app.queue_tiket.enqueue(nama)
+
+                print(f"{nama} masuk antrean!")
+
+            # Proses antrean
+            elif q == "2":
+
+                proses = app.queue_tiket.dequeue()
+
+                if proses:
+                    print(f"Tiket {proses} diproses!")
+                else:
+                    print("Antrean kosong!")
+
+            # Lihat antrean
+            elif q == "3":
+
+                antrean = app.queue_tiket.display()
+
+                if antrean:
+                    print("Daftar Antrean:")
+                    for i, nama in enumerate(antrean, start=1):
+                        print(f"{i}. {nama}")
+                else:
+                    print("Belum ada antrean.")
+
+            else:
+                print("Pilihan tidak valid!")
+
+        # =====================================================
+        # SINGLE LINKED LIST
+        # =====================================================
+        elif pilih == "9":
+
+            print("\nJadwal:")
+            print(app.sll.display())
+
+        # =====================================================
+        # DOUBLE LINKED LIST
+        # =====================================================
+        elif pilih == "10":
+
+            if app.dll.current:
+
+                print(f"\nFoto Saat Ini: {app.dll.current.data}")
+
+                nav = input("n/p: ")
+
+                if nav == "n":
+
+                    if app.dll.current.next:
+                        app.dll.current = app.dll.current.next
+
+                elif nav == "p":
+
+                    if app.dll.current.prev:
+                        app.dll.current = app.dll.current.prev
+
+                print("Sekarang:", app.dll.current.data)
+
+        # =====================================================
+        # CIRCULAR LINKED LIST
+        # =====================================================
+        elif pilih == "11":
+
+            if app.cll.head:
+
+                curr = app.cll.head
+
+                print("\nSlideshow:")
+
+                for i in range(5):
+                    print(curr.data)
+                    curr = curr.next
+
+        # =====================================================
+        # TREE
+        # =====================================================
+        elif pilih == "12":
+
+            print("\n=== TREE KATEGORI ===")
+
+            print(app.root_cat.name)
+
+            for cat in app.root_cat.children:
+
+                print(f" ├── {cat.name}")
+
+                for tempat in cat.children:
+
+                    print(f" │    ├── {tempat.name}")
+
+        # =====================================================
+        # GRAPH
+        # =====================================================
+        elif pilih == "13":
+
+            if len(app.db) >= 2:
+
+            # RESET GRAPH AGAR TIDAK DUPLIKAT
+                app.graph = TravelGraph()
+
+                for i in range(len(app.db)-1):
+                    asal = app.db[i].nama
+                    tujuan = app.db[i+1].nama
+
+                    jarak = int(input(
+                    f"Jarak {asal} ke {tujuan} (KM): "
+                ))
+
+                app.graph.add_edge(
+                    asal,
+                    tujuan,
+                    jarak
+            )
+
+                print("\n=== GRAPH ===")
+
+                for asal, tujuan in app.graph.adj.items():
+
+                    print(f"{asal} --> {tujuan}")
+
+            else:
+                print("Minimal 2 destinasi.")
+            
+        # =====================================================
+        # HASH TABLE
+        # =====================================================
+        elif pilih == "14":
+
+            tid = input("Masukkan ID Tiket: ")
+
+            app.hash_tix.insert(tid)
+
+            cek = input("Cek ID Tiket: ")
+
+            if app.hash_tix.check(cek):
+                print("VALID")
+            else:
+                print("TIDAK VALID")
+
+        # =====================================================
+        # EXIT
+        # =====================================================
+        elif pilih == "0":
+
+            print("Program selesai.")
+            break
+
+        else:
+            print("Pilihan tidak valid!")
+
+
+# =============================================================
+# ENTRY POINT
+# =============================================================
+if __name__ == "__main__":
+    main()

@@ -6,7 +6,7 @@ class AppPlanner:
         self.db = []
 
         self.stack_undo = []
-        self.queue_tiket = []
+        self.queue_tiket = TicketQueue()
 
         self.sll = ItinerarySLL()
         self.dll = PhotoDLL()
