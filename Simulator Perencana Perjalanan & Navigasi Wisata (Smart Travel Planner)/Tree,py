@@ -1,10 +1,13 @@
 # =============================================================
 # TREE
+# Digunakan untuk mengelompokkan destinasi berdasarkan kategori.
+# Struktur: root "Wisata" -> anak "Alam/Budaya/Kuliner" -> cucu (nama destinasi)
 # =============================================================
 class CategoryTree:
     def __init__(self, name):
-        self.name = name
-        self.children = []
+        self.name = name        # Nama node (misal: "Wisata", "Alam", "Bali")
+        self.children = []      # List anak-anak node ini
 
     def add_child(self, child):
+        # Tambahkan node anak ke node ini
         self.children.append(child)

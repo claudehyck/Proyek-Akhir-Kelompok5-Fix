@@ -1,10 +1,12 @@
 # =============================================================
 # MAIN PROGRAM
+# Fungsi utama: membuat objek AppPlanner dan menampilkan menu
+# berulang (loop) sampai user memilih keluar (0).
 # =============================================================
 def main():
-    app = AppPlanner()
+    app = AppPlanner()   # Buat satu objek AppPlanner yang dipakai sepanjang program
 
-    while True:
+    while True:   # Loop terus sampai user pilih "0" (keluar)
 
         print("\n=== SMART TRAVEL PLANNER ===")
         print("1. Tambah Destinasi")
@@ -23,10 +25,12 @@ def main():
         print("14. Validasi Tiket")
         print("0. Keluar")
 
-        pilih = input("\nPilih Menu: ")
+        pilih = input("\nPilih Menu: ")   # Tampung pilihan user
 
         # =====================================================
         # TAMBAH DESTINASI
+        # Input semua data destinasi dengan validasi, lalu simpan
+        # ke semua struktur data sekaligus (db, sll, dll, cll, tree, stack)
         # =====================================================
         if pilih == "1":
             nama = input("Nama Destinasi: ")
@@ -91,6 +95,7 @@ def main():
                 kat = "Kuliner"
 
             # 6. Input Koordinat (PASTIKAN DI SINI, DI LUAR LOOP BIAYA)
+            # Validasi latitude: harus float antara -90 s/d 90
             while True:
                 try:
                     lat = input("Latitude (-90 s/d 90): ")
@@ -103,6 +108,7 @@ def main():
                 except ValueError:
                     print("Latitude harus berupa angka!")
 
+            # Validasi longitude: harus float antara -180 s/d 180
             while True:
                 try:
 
@@ -119,33 +125,37 @@ def main():
                     print("Longitude harus berupa angka!")
 
             # 7. Memasukkan data ke Objek Destinasi dan Struktur Data
+            # Buat objek Destinasi baru dari semua input yang sudah divalidasi
             d = Destinasi(
                 nama,
                 rating,
                 tiket,
                 hotel,
                 makan,
-                {kat},
-                (lat, lon)
+                {kat},          # Set berisi satu kategori
+                (lat, lon)      # Tuple koordinat
             )
 
-            app.db.append(d)
-            app.sll.add(nama)
-            app.dll.add(f"Foto_{nama}.jpg")
-            app.cll.add(nama)
-            app.stack_undo.append(nama)
+            app.db.append(d)               # Simpan ke database utama (list)
+            app.sll.add(nama)              # Tambah nama ke Single Linked List (jadwal)
+            app.dll.add(f"Foto_{nama}.jpg") # Tambah foto ke Double Linked List (galeri)
+            app.cll.add(nama)              # Tambah ke Circular Linked List (slideshow)
+            app.stack_undo.append(nama)    # Push ke stack untuk keperluan undo
 
+            # Tambah ke Tree Kategori jika kategori belum ada
             if kat not in app.kategori_terdaftar:
                 node_kat = CategoryTree(kat)
-                app.root_cat.add_child(node_kat)
-                app.kategori_terdaftar[kat] = node_kat
+                app.root_cat.add_child(node_kat)         # Sambungkan ke root
+                app.kategori_terdaftar[kat] = node_kat   # Daftarkan di dict
 
+            # Tambah nama destinasi sebagai anak dari node kategorinya
             app.kategori_terdaftar[kat].add_child(CategoryTree(nama))
 
             print("Destinasi berhasil ditambahkan!")
 
         # =====================================================
         # SORTING
+        # Pilih sorting berdasarkan rating (desc) atau biaya (asc)
         # =====================================================
         elif pilih == "2":
 
@@ -155,7 +165,7 @@ def main():
             s = input("Pilih: ")
 
             if s == "1":
-                app.sort_rating()
+                app.sort_rating()   # Panggil bubble sort rating (descending)
 
                 print("\nHasil Sorting Rating:")
 
@@ -163,7 +173,7 @@ def main():
                     print(f"{d.nama} | Rating: {d.rating}")
 
             elif s == "2":
-                app.sort_biaya()
+                app.sort_biaya()   # Panggil bubble sort biaya (ascending)
 
                 print("\nHasil Sorting Biaya:")
 
@@ -172,12 +182,13 @@ def main():
 
         # =====================================================
         # SEARCHING
+        # Cari destinasi berdasarkan kata kunci nama (linear search)
         # =====================================================
         elif pilih == "3":
 
             key = input("Cari Destinasi: ")
 
-            hasil = app.cari_destinasi(key)
+            hasil = app.cari_destinasi(key)   # Kembalikan list hasil pencarian
 
             if hasil:
 
@@ -195,6 +206,8 @@ def main():
 
         # =====================================================
         # SAVE FILE
+        # Simpan semua destinasi ke file teks "itinerary.txt"
+        # Format tiap baris: nama|rating|biaya
         # =====================================================
         elif pilih == "4":
 
@@ -210,6 +223,8 @@ def main():
 
         # =====================================================
         # LOAD FILE
+        # Baca dan tampilkan isi file "itinerary.txt"
+        # Jika file belum ada, tampilkan pesan error
         # =====================================================
         elif pilih == "5":
 
@@ -219,22 +234,25 @@ def main():
                     print("\n=== DATA FILE ===")
 
                     for line in f:
-                        print(line.strip())
+                        print(line.strip())   # strip() hilangkan newline di akhir baris
 
             except:
                 print("File belum ada!")
 
         # =====================================================
         # REKURSIF
+        # Hitung total biaya semua destinasi menggunakan fungsi rekursif
         # =====================================================
         elif pilih == "6":
 
-            total = app.hitung_biaya_rekursif(len(app.db))
+            total = app.hitung_biaya_rekursif(len(app.db))   # Mulai dari destinasi terakhir
 
             print(f"\nTotal Biaya Perjalanan: Rp{total}")
 
         # =====================================================
-        # STACK
+        # STACK (UNDO)
+        # Hapus destinasi terakhir yang ditambahkan dari semua struktur data
+        # Prinsip LIFO: yang terakhir masuk, pertama keluar
         # =====================================================
         elif pilih == "7":
 
@@ -244,7 +262,8 @@ def main():
                 print("Tidak ada data.")
 
                 # =====================================================
-        # QUEUE
+        # QUEUE (Antrian Tiket)
+        # Kelola antrian tiket wisata: tambah, proses, atau lihat antrian
         # =====================================================
         elif pilih == "8":
 
@@ -255,26 +274,26 @@ def main():
 
             q = input("Pilih: ")
 
-            # Tambah antrean
+            # Tambah antrean: masukkan nama turis ke belakang antrian
             if q == "1":
 
                 nama = input("Nama Turis: ")
 
-                app.queue_tiket.enqueue(nama)
+                app.queue_tiket.enqueue(nama)   # FIFO: masuk dari belakang
 
                 print(f"{nama} masuk antrean!")
 
-            # Proses antrean
+            # Proses antrean: keluarkan turis paling depan
             elif q == "2":
 
-                proses = app.queue_tiket.dequeue()
+                proses = app.queue_tiket.dequeue()   # FIFO: keluar dari depan
 
                 if proses:
                     print(f"Tiket {proses} diproses!")
                 else:
                     print("Antrean kosong!")
 
-            # Lihat antrean
+            # Lihat antrean: tampilkan seluruh isi antrian saat ini
             elif q == "3":
 
                 antrean = app.queue_tiket.display()
@@ -291,14 +310,17 @@ def main():
 
         # =====================================================
         # SINGLE LINKED LIST
+        # Tampilkan jadwal kunjungan dalam format A -> B -> C
         # =====================================================
         elif pilih == "9":
 
             print("\nJadwal:")
-            print(app.sll.display())
+            print(app.sll.display())   # Panggil method display() dari SLL
 
         # =====================================================
-        # DOUBLE LINKED LIST
+        # DOUBLE LINKED LIST (Galeri Foto)
+        # Navigasi foto ke depan (n) atau ke belakang (p)
+        # Bisa dua arah karena DLL punya pointer next DAN prev
         # =====================================================
         elif pilih == "10":
 
@@ -306,22 +328,24 @@ def main():
 
                 print(f"\nFoto Saat Ini: {app.dll.current.data}")
 
-                nav = input("n/p: ")
+                nav = input("n/p: ")   # n = next (maju), p = prev (mundur)
 
                 if nav == "n":
 
                     if app.dll.current.next:
-                        app.dll.current = app.dll.current.next
+                        app.dll.current = app.dll.current.next   # Geser ke foto berikutnya
 
                 elif nav == "p":
 
                     if app.dll.current.prev:
-                        app.dll.current = app.dll.current.prev
+                        app.dll.current = app.dll.current.prev   # Geser ke foto sebelumnya
 
                 print("Sekarang:", app.dll.current.data)
 
         # =====================================================
-        # CIRCULAR LINKED LIST
+        # CIRCULAR LINKED LIST (Slideshow)
+        # Tampilkan 5 item berurutan. Karena melingkar, setelah
+        # item terakhir otomatis kembali ke item pertama.
         # =====================================================
         elif pilih == "11":
 
@@ -331,41 +355,46 @@ def main():
 
                 print("\nSlideshow:")
 
-                for i in range(5):
+                for i in range(5):       # Tampilkan 5 item
                     print(curr.data)
-                    curr = curr.next
+                    curr = curr.next     # Setelah node terakhir otomatis kembali ke head
 
         # =====================================================
         # TREE
+        # Tampilkan struktur pohon kategori dalam format teks
+        # Root -> Kategori -> Destinasi
         # =====================================================
         elif pilih == "12":
 
             print("\n=== TREE KATEGORI ===")
 
-            print(app.root_cat.name)
+            print(app.root_cat.name)   # Cetak root: "Wisata"
 
             for cat in app.root_cat.children:
 
-                print(f" ├── {cat.name}")
+                print(f" ├── {cat.name}")   # Cetak kategori (Alam/Budaya/Kuliner)
 
                 for tempat in cat.children:
 
-                    print(f" │    ├── {tempat.name}")
+                    print(f" │    ├── {tempat.name}")   # Cetak nama destinasi
 
         # =====================================================
         # GRAPH
+        # Bangun graf jalur antar destinasi berdasarkan input jarak user.
+        # Setiap pasang destinasi berurutan dihubungkan dengan satu edge.
         # =====================================================
         elif pilih == "13":
 
-            if len(app.db) >= 2:
+            if len(app.db) >= 2:   # Minimal 2 destinasi untuk membuat edge
 
             # RESET GRAPH AGAR TIDAK DUPLIKAT
-                app.graph = TravelGraph()
+                app.graph = TravelGraph()   # Buat ulang graf kosong sebelum diisi ulang
 
                 for i in range(len(app.db)-1):
                     asal = app.db[i].nama
                     tujuan = app.db[i+1].nama
 
+                    # Minta user input jarak antara dua destinasi berurutan
                     jarak = int(input(
                     f"Jarak {asal} ke {tujuan} (KM): "
                 ))
@@ -378,6 +407,7 @@ def main():
 
                 print("\n=== GRAPH ===")
 
+                # Tampilkan adjacency list: setiap kota dan tetangganya
                 for asal, tujuan in app.graph.adj.items():
 
                     print(f"{asal} --> {tujuan}")
@@ -386,16 +416,18 @@ def main():
                 print("Minimal 2 destinasi.")
             
         # =====================================================
-        # HASH TABLE
+        # HASH TABLE (Validasi Tiket)
+        # Simpan ID tiket ke hash table, lalu cek apakah ID lain valid
         # =====================================================
         elif pilih == "14":
 
             tid = input("Masukkan ID Tiket: ")
 
-            app.hash_tix.insert(tid)
+            app.hash_tix.insert(tid)   # Hash ID tiket dan simpan ke slot yang sesuai
 
             cek = input("Cek ID Tiket: ")
 
+            # Cek apakah ID tiket yang dicari ada di hash table
             if app.hash_tix.check(cek):
                 print("VALID")
             else:
@@ -403,18 +435,16 @@ def main():
 
         # =====================================================
         # EXIT
+        # Keluar dari loop while -> program selesai
         # =====================================================
         elif pilih == "0":
 
             print("Program selesai.")
-            break
+            break   # Hentikan loop while True
 
         else:
             print("Pilihan tidak valid!")
 
 
-# =============================================================
-# ENTRY POINT
-# =============================================================
 if __name__ == "__main__":
     main()
