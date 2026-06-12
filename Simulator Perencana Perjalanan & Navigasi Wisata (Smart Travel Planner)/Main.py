@@ -217,20 +217,26 @@ def main():
 
         # =====================================================
         # LOAD FILE
-        # Baca dan tampilkan isi file "itinerary.txt"
-        # Jika file belum ada, tampilkan pesan error
         # =====================================================
         elif pilih == "5":
 
-            try:
-                with open("itinerary.txt", "r") as f:
+            if app.load_file():
 
-                    print("\n=== DATA FILE ===")
+                print("Data berhasil di-load!")
 
-                    for line in f:
-                        print(line.strip())   # strip() hilangkan newline di akhir baris
+                print("\n=== DATA DESTINASI ===")
 
-            except:
+                for d in app.db:
+
+                    print(f"""
+        Nama      : {d.nama}
+        Rating    : {d.rating}
+        Biaya     : Rp{d.biaya}
+        Kategori  : {list(d.kategori)[0]}
+        Koordinat : {d.koordinat}
+        """)
+
+            else:
                 print("File belum ada!")
 
         # =====================================================
@@ -374,37 +380,41 @@ def main():
 
         # =====================================================
         # GRAPH
-        # Bangun graf jalur antar destinasi berdasarkan input jarak user.
-        # Setiap pasang destinasi berurutan dihubungkan dengan satu edge.
+        # Bangun graph jalur antar destinasi
         # =====================================================
         elif pilih == "13":
-
-            if len(app.db) >= 2:   # Minimal 2 destinasi untuk membuat edge
-
-            # RESET GRAPH AGAR TIDAK DUPLIKAT
-                app.graph = TravelGraph()   # Buat ulang graf kosong sebelum diisi ulang
+            if len(app.db) >= 2:
+                app.graph = TravelGraph()
 
                 for i in range(len(app.db)-1):
                     asal = app.db[i].nama
                     tujuan = app.db[i+1].nama
 
-                    # Minta user input jarak antara dua destinasi berurutan
-                    jarak = int(input(
-                    f"Jarak {asal} ke {tujuan} (KM): "
-                ))
-
-                app.graph.add_edge(
-                    asal,
-                    tujuan,
-                    jarak
-            )
+                    while True:
+                        try:
+                            jarak = int(input(
+                                f"Jarak {asal} ke {tujuan} (KM): "
+                            ))
+                            if jarak <= 0:
+                                print("Jarak harus lebih dari 0!")
+                                continue
+                            break
+                        except ValueError:
+                            print("Jarak harus angka!")
+                    app.graph.add_edge(
+                        asal,
+                        tujuan,
+                        jarak
+                    )
 
                 print("\n=== GRAPH ===")
 
-                # Tampilkan adjacency list: setiap kota dan tetangganya
-                for asal, tujuan in app.graph.adj.items():
+                for kota, tetangga in app.graph.adj.items():
 
-                    print(f"{asal} --> {tujuan}")
+                    print(f"\n{kota} terhubung ke:")
+
+                    for tujuan, jarak in tetangga:
+                        print(f" -> {tujuan} ({jarak} KM)")
 
             else:
                 print("Minimal 2 destinasi.")
