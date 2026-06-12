@@ -211,15 +211,9 @@ def main():
         # =====================================================
         elif pilih == "4":
 
-            with open("itinerary.txt", "w") as f:
+            app.save_file()
 
-                for d in app.db:
-
-                    f.write(f"{d.nama}|")
-                    f.write(f"{d.rating}|")
-                    f.write(f"{d.biaya}\n")
-
-            print("Data berhasil disimpan.")
+            print("Data berhasil disimpan!")
 
         # =====================================================
         # LOAD FILE
