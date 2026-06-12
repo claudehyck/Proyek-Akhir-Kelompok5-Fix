@@ -1,3 +1,4 @@
+from Graph import TravelGraph
 # =========================================================
 # UNDO DESTINASI
 # Menghapus destinasi terakhir dari semua struktur data
